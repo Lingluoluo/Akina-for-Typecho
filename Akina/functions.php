@@ -230,8 +230,17 @@ function getNextPrev($mode, $archive){
     $result = null;
     if ($content) {
         $content = $archive->filter($content);
-        $title = $content['title'];
-        $link = $content['permalink'];
+        $title = isset($content['title']) ? $content['title'] : '';
+        // Typecho 1.3 的 filter() 不保证包含 permalink，缺失时回退到路由生成
+        if (!empty($content['permalink'])) {
+            $link = $content['permalink'];
+        } else {
+            try {
+                $link = \Typecho\Router::url($archive->type, $content, $archive->options->index);
+            } catch (\Throwable $e) {
+                $link = $archive->options->siteUrl;
+            }
+        }
 
         $query = $db->select()->from('table.fields')
             ->where('table.fields.cid = ?', $content['cid'])

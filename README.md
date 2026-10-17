@@ -3,6 +3,88 @@ Akina for Typecho 主题模板（项目已不再维护）
 
 ![image](https://github.com/Zisbusy/Akina-for-Typecho/blob/master/Akina-img/Akina.jpg)
 
+## 关于本分支
+
+本仓库是 [Zisbusy/Akina-for-Typecho](https://github.com/Zisbusy/Akina-for-Typecho) 的个人定制版本，
+修改过程有 AI 辅助，主要供自己的站点部署使用，不保证通用性，亦不承担上游主题的维护职责。
+如需原版，请前往[上游仓库](https://github.com/Zisbusy/Akina-for-Typecho)。
+
+### 功能改动
+
+#### 首页
+
+![首页](Akina-img/custom-home.png)
+
+头像下方新增半透明卡片，承载站点标语与社交入口；标语与社交均未配置时整体不渲染。
+
+#### 文章列表
+
+![文章列表](Akina-img/custom-article.png)
+
+由左侧缩略图 + 右侧文字改为卡片布局：顶部信息栏（发布日期、热度、分类、字数、预计阅读时长）、左侧摘要面板、右侧封面图与叠加标题。
+
+#### 说说
+
+![说说](Akina-img/custom-moment.png)
+
+标记 `dtMode` 的文章使用独立卡片样式，展示头像、等级标识、完整正文与内嵌图片。
+
+#### 页尾
+
+![页尾](Akina-img/custom-footer.png)
+
+重构为：一言、版权信息、ICP 备案号、建站时长、联系方式。其中建站时长可配置是否显示及起始日期。
+
+#### 表情面板
+
+![表情面板](Akina-img/custom-emoji.png)
+
+集成阿鲁、bilibili、贴吧、颜文字四套表情。
+
+#### 评论者环境
+
+![评论者环境](Akina-img/custom-comment-env.png)
+
+展示评论者的浏览器、操作系统、IP 归属地与 CDN 节点；评论区默认展开。
+
+#### 版权声明
+
+由 CC BY-NC-SA 3.0 更新至 4.0；复制正文内容时自动附加来源与原文链接。
+
+#### 移动端
+
+首页、文章列表、说说、页尾均完成窄屏适配。
+
+#### 配置分离
+
+备案号、邮箱、社交链接等个人信息移至 `local.php`。
+
+### 配置文件
+
+```bash
+cp local.php.example local.php
+```
+
+按需填写，字段说明见模板注释。未配置时相关元素自动隐藏，不影响其余功能。
+
+### 插件依赖
+
+主题不依赖插件即可运行。以下插件为开发时自行开发配套使用（不在本仓库内，未开源，如有需要可借助 AI 自行编写）：
+
+| 插件 | 作用 |
+|---|---|
+| AkLinks | `/links/` 友链页、`/apply/` 申请页、后台审核 |
+| AkSite | 登录验证码、自定义头像、OSS 上传 |
+| AkMail | 发邮件（供 AkLinks 调用） |
+
+未安装时请自行借助 AI 工具修改 `page.php` 的渲染逻辑。
+
+---
+
+**以下为原主题 README 内容，未作改动。**
+
+---
+
 ## 模版特点
 
 1. 同时采用`QQ`和`Gravatar`，来适应国内环境，QQ邮箱优先使用`QQ`头像，

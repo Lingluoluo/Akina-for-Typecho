@@ -151,8 +151,10 @@ function authorProfile($src,$theurl){
         if(substr($src,0,1)=="i"){
             $src = $theurl . $src;
         }
+        return $src;
     }
-    return $src;
+    // 未配置时的默认头像
+    return $theurl . 'images/default-avatar.svg';
 }
 //阅读次数统计
 function Postviews($archive) {
@@ -390,3 +392,4 @@ function getRandomPosts($limit = 10){
 	}
 }
 ?>
+

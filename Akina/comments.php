@@ -1,3 +1,111 @@
+<?php
+/* 把评论里的表情码还原成图片：{{bili}} / ::tieba:: / @(阿鲁) 全部由 OwO.json 驱动 */
+function ak_emoji_render($text) {
+    if (!$text) return $text;
+    static $map = null;
+    if ($map === null) {
+        $map = [];
+        $jf = __TYPECHO_ROOT_DIR__ . '/usr/themes/akina/images/smilies/OwO.json';
+        $raw = @file_get_contents($jf);
+        $data = $raw ? json_decode($raw, true) : [];
+        if (is_array($data)) {
+            foreach ($data as $g) {
+                if (!isset($g['type']) || $g['type'] !== 'image' || empty($g['container'])) continue;
+                foreach ($g['container'] as $it) {
+                    if (!empty($it['text']) && !empty($it['icon'])) {
+                        $map[$it['text']] = $it['icon'];
+                    }
+                }
+            }
+        }
+    }
+    if (!$map) return $text;
+    $keys = array_keys($map);
+    usort($keys, function ($a, $b) { return strlen($b) - strlen($a); });
+    foreach ($keys as $k) {
+        if (strpos($text, $k) === false) continue;
+        $text = str_replace($k, '<img class="ak-emoji" src="' . theurl . $map[$k] . '" alt="' . htmlspecialchars($k) . '">', $text);
+    }
+    return $text;
+}
+?>
+<?php
+/* 评论环境：浏览器/系统 图标+名称+版本 + IP 归属地（不显示 IP 本身） */
+function ak_ua_parse($ua) {
+    $ua = (string)$ua;
+    $os = ['name' => '未知系统', 'icon' => 'unknown'];
+    $osMap = [
+        ['Windows NT 10', 'Windows 10/11', 'windows'],
+        ['Windows NT 6.3', 'Windows 8.1', 'windows'],
+        ['Windows NT 6.1', 'Windows 7', 'windows'],
+        ['Windows', 'Windows', 'windows'],
+        ['iPad', 'iPadOS', 'apple'],
+        ['iPhone', 'iOS', 'apple'],
+        ['Mac OS X', 'macOS', 'apple'],
+        ['Android', 'Android', 'android'],
+        ['Linux', 'Linux', 'linux'],
+    ];
+    foreach ($osMap as $m) {
+        if (stripos($ua, $m[0]) !== false) { $os = ['name' => $m[1], 'icon' => $m[2]]; break; }
+    }
+    $br = ['name' => '未知浏览器', 'ver' => '', 'icon' => 'unknown'];
+    $brMap = [
+        ['Edg/', 'Edge', 'edge'],
+        ['OPR/', 'Opera', 'opera'],
+        ['Firefox/', 'Firefox', 'firefox'],
+        ['Chrome/', 'Chrome', 'chrome'],
+        ['Safari/', 'Safari', 'safari'],
+    ];
+    foreach ($brMap as $m) {
+        if (stripos($ua, $m[0]) !== false) {
+            $ver = '';
+            if (preg_match('#' . preg_quote($m[0], '#') . '([0-9]+)#', $ua, $mm)) { $ver = $mm[1]; }
+            // Safari 的版本号在 Version/ 里
+            if ($m[1] === 'Safari' && preg_match('#Version/([0-9]+)#', $ua, $mm)) { $ver = $mm[1]; }
+            $br = ['name' => $m[1], 'ver' => $ver, 'icon' => $m[2]];
+            break;
+        }
+    }
+    return [$br, $os];
+}
+
+function ak_is_cdn_ip($ip) {
+    static $cache = [];
+    if (isset($cache[$ip])) return $cache[$ip];
+    $db = Typecho_Db::get();
+    $r = $db->fetchRow($db->select('ip')->from('preview_cdn_ips')->where('ip = ?', $ip));
+    $is = !empty($r);
+    if (!$is && $ip) {
+        $parts = explode('.', $ip);
+        if (count($parts) === 4) {
+            $net = $parts[0] . '.' . $parts[1] . '.' . $parts[2] . '.0/24';
+            $r2 = $db->fetchRow($db->select('net')->from('preview_cdn_nets')->where('net = ?', $net));
+            $is = !empty($r2);
+        }
+    }
+    $cache[$ip] = $is;
+    return $is;
+}
+
+function ak_comment_env($coid) {
+    static $cache = [];
+    if (isset($cache[$coid])) return $cache[$coid];
+    $db = Typecho_Db::get();
+    $row = $db->fetchRow($db->select('ip', 'agent')->from('table.comments')->where('coid = ?', $coid));
+    $ip = isset($row['ip']) ? $row['ip'] : '';
+    $ua = isset($row['agent']) ? $row['agent'] : '';
+    list($br, $os) = ak_ua_parse($ua);
+    $loc = '未知地区';
+    $isCdn = false;
+    if ($ip) {
+        $g = $db->fetchRow($db->select('loc')->from('preview_geo')->where('ip = ?', $ip));
+        if ($g && !empty($g['loc'])) $loc = $g['loc'];
+        $isCdn = ak_is_cdn_ip($ip);
+    }
+    $cache[$coid] = [$br, $os, $loc, $isCdn];
+    return $cache[$coid];
+}
+?>
 <?php function threadedComments($comments, $options) {
     $commentClass = '';
     if ($comments->authorId) {
@@ -40,12 +148,13 @@
 				<a rel='nofollow' class='comment-reply-link' href='<?php $comments->responseUrl(); ?>' onclick="return TypechoComment.reply('<?php $comments->theId(); ?>', <?php $comments->coid();?>);" aria-label='回复给<?php $comments->author(false); ?>'>回复</a>
 				<div class="right">
 					<div class="info"><time datetime="<?php $comments->date('Y-m-d'); ?>"><?php $comments->date('Y年m月d日'); ?></time></div>
+					<div class="cmt-env"><?php list($__br,$__os,$__loc,$__is_cdn)=ak_comment_env($comments->coid); ?>（<span class="ua"><img class="ua-ico" src="<?php echo theurl; ?>images/ua/<?php echo $__br['icon']; ?>.svg" alt=""><?php echo $__br['name']; ?><?php if($__br['ver']){ echo ' ' . $__br['ver']; } ?></span><span class="ua"><img class="ua-ico" src="<?php echo theurl; ?>images/ua/<?php echo $__os['icon']; ?>.svg" alt=""><?php echo $__os['name']; ?></span>）来自：<?php if ($__is_cdn): ?><span class="cmt-loc cmt-cdn" title="这条评论记录到的是 CDN 回源 IP（<?php echo $__loc; ?> 是节点位置），不是访客真实位置">CDN 节点<?php echo $__loc !== "未知地区" ? '（节点：' . $__loc . '）' : ""; ?><span class="cmt-cdn-tag">访客位置未知</span></span><?php else: ?><span class="cmt-loc"><?php echo $__loc; ?></span><?php endif; ?></div>
 				</div>
 			</section>
 			<div class="body">
 				<p>
 					<?php get_commentReply_at($comments->coid); ?>                                   <!-- 评论@ -->
-					<?php $cos = preg_replace('#</?[p|P][^>]*>#','',$comments->content);echo $cos;?> <!-- 评论内容 -->
+					<?php $cos = preg_replace('#</?[p|P][^>]*>#','',$comments->content); echo ak_emoji_render($cos);?> <!-- 评论内容 -->
 				</p>
 			</div>
 		</div>
@@ -60,7 +169,7 @@
 
 <section id="comments" class="comments">
 	<!-- 隐藏评论 -->
-	<div class="commentwrap comments-hidden">
+	<div class="commentwrap">
 		<div class="notification"><i class="iconfont">&#xe610;</i><?php $this->commentsNum(_t('添加评论'), _t('查看沙发'), _t('查看评论')); ?></div>
 	</div>
 		<!-- 输出评论信息 -->
@@ -111,6 +220,7 @@
 						<input class="submit" name="submit" type="submit" id="submit" tabindex="5" value="发表评论" />
 						<input type='hidden' name='comment_post_ID' value='58' id='comment_post_ID' />
 						<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+						<input type="hidden" name="_" value="<?php echo $this->security->getToken($this->request->getRequestUrl()); ?>" />
 							<!--表情-->
 						<div class="OwO"></div>
 						<script type="text/javascript" src="<?php echo theurl; ?>js/OwO.js" defer="defer"></script>

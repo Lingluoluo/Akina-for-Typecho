@@ -1,0 +1,647 @@
+/* =============================================================
+   本地主题定制（从数据库 cssCode 抽离）
+   包含：文章列表布局、评论区、表情面板、CDN 标注等
+   ============================================================= */
+
+/* ===== 预览站定制 ===== */
+/* 文章列表：方形缩略图在左，正文在右 */
+.post-list .post-entry{
+  display:grid !important;
+  grid-template-columns:220px minmax(0,1fr);
+  column-gap:22px;
+  align-items:start;
+}
+.post-list .post-entry > .feature{
+  grid-row:1 / span 4;
+  margin:0 !important;
+  overflow:hidden;
+  border-radius:8px;
+}
+.post-list .post-entry > .feature img{
+  width:220px; height:150px;
+  object-fit:cover;
+  border-radius:8px !important;
+  display:block;
+}
+.post-list .post-entry > *:not(.feature){ grid-column:2; }
+.post-list .post-entry .entry-title{ margin:0 0 6px 0 !important; font-size:20px; line-height:1.4; }
+.post-list .post-entry .p-time{ margin:0 0 8px 0 !important; }
+.post-list .post-entry p{ margin:0 0 8px 0; }
+.post-list .post-entry .entry-footer{ margin-top:6px; }
+
+/* 横幅：头像 + 社交图标居中 */
+.focusinfo .header-tou img{ border-radius:50%; }
+.top-social{ display:flex; gap:12px; justify-content:center; }
+
+/* 评论环境信息 */
+.cmt-env{
+  font-size:12px; color:#999; margin-top:2px;
+  letter-spacing:.2px;
+}
+.cmt-env .cmt-ip{ font-family:ui-monospace,Consolas,monospace; }
+@media (max-width:768px){
+  .post-list .post-entry{ grid-template-columns:1fr; }
+  .post-list .post-entry > .feature{ grid-row:auto; }
+  .post-list .post-entry > *{ grid-column:1; }
+  .post-list .post-entry > .feature img{ width:100%; height:180px; }
+}
+
+/* ===== 评论区默认展开（覆盖 theme js 的折叠） ===== */
+.comments .comments-main{ display:block !important; }
+.commentwrap{ display:none !important; }
+.comments{padding-top:10px;}
+
+/* ===== 评论环境信息（图标+归属地） ===== */
+.cmt-env{ font-size:12px; color:#9aa0a6; margin-top:4px; line-height:1.6; }
+.cmt-env .ua{ display:inline-flex; align-items:center; gap:3px; margin-right:6px; }
+.cmt-env .ua-ico{ width:13px; height:13px; vertical-align:middle; opacity:.85; }
+.cmt-env .cmt-loc{ color:#7b8794; }
+.comments .comments-main{ display:block !important; }
+.commentwrap{ display:none !important; }
+
+/* 评论环境信息：保持原样大小写、图标尺寸 */
+.cmt-env{ text-transform:none !important; font-variant:none; }
+.cmt-env .ua{ text-transform:none !important; }
+.cmt-env .ua-ico{ width:14px; height:14px; }
+.comment .info, .comment time{ text-transform:none; }
+
+/* CDN 回源 IP 标注 */
+.cmt-cdn{ color:#e08a3c !important; cursor:help; }
+.cmt-cdn-tag{ font-size:10px; background:#fdf0e2; color:#c9772a; border-radius:3px; padding:1px 4px; margin-left:4px; }
+
+/* 评论表情 */
+.ak-emoji{ height:1.6em; width:auto; vertical-align:-0.35em; margin:0 1px; }
+.OwO .OwO-body{ z-index:99; }
+
+/* 颜文字面板（文字型表情）——只作用于当前分页 */
+.OwO .OwO-items-text.OwO-items-show{ display:flex !important; flex-wrap:wrap; gap:6px; padding:8px; }
+.OwO .OwO-items-text .OwO-item{
+  background:#f6f7f9; border:1px solid #eceef2; border-radius:6px;
+  padding:4px 8px; font-size:13px; line-height:1.2; cursor:pointer;
+  white-space:nowrap; transition:background .15s,border-color .15s;
+}
+.OwO .OwO-items-text .OwO-item:hover{ background:#eef6f2; border-color:#b8dfc9; }
+.OwO .OwO-items-image .OwO-item img{ width:26px; height:26px; object-fit:contain; }
+
+.OwO .OwO-items:not(.OwO-items-show){ display:none !important; }
+
+/* ===== 首页 banner：文案 + 社交卡片 ===== */
+.focusinfo .ak-focus-card{
+  display:inline-block;
+  margin-top:18px;
+  padding:20px 34px 16px;
+  border-radius:16px;
+  background:rgba(255,255,255,.18);
+  backdrop-filter:blur(14px) saturate(150%);
+  -webkit-backdrop-filter:blur(14px) saturate(150%);
+  border:1px solid rgba(255,255,255,.35);
+  box-shadow:0 12px 34px rgba(0,0,0,.18);
+}
+.focusinfo .ak-slogan{
+  margin:0 0 14px;
+  font-size:15.5px;
+  letter-spacing:2px;
+  color:#fff;
+  text-shadow:0 2px 10px rgba(0,0,0,.35);
+  font-weight:500;
+}
+.focusinfo .ak-focus-card .top-social{
+  display:flex; justify-content:center; gap:14px;
+  margin:0; padding:0; list-style:none;
+}
+.focusinfo .ak-focus-card .top-social img{
+  width:26px; height:26px; border-radius:50%;
+  transition:transform .18s;
+}
+.focusinfo .ak-focus-card .top-social a:hover img{ transform:translateY(-2px) scale(1.08); }
+@media (max-width:768px){
+  .focusinfo .ak-focus-card{ padding:16px 18px 12px; }
+  .focusinfo .ak-slogan{ font-size:13.5px; letter-spacing:1px; }
+}
+
+/* ===== 文章列表：Sakurairo 卡片 ===== */
+.ak-card{
+  margin:0 0 34px;
+  border-radius:16px;
+  background:rgba(255,255,255,.75);
+  border:1px solid rgba(255,255,255,.9);
+  box-shadow:0 2px 26px -6px #e6e9ee;
+  transition:box-shadow .25s ease, transform .25s ease;
+}
+.ak-card:hover{ box-shadow:0 8px 34px -8px #dfe4ea; transform:translateY(-2px); }
+.ak-card-meta{
+  display:flex; flex-wrap:wrap; align-items:center; gap:6px 18px;
+  padding:12px 18px;
+  font-size:12.5px; color:#8a96a3;
+  border-bottom:1px dashed #eef2f5;
+}
+.ak-card-meta .m{ display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
+.ak-card-meta .iconfont{ font-size:13px; color:#9fb0bf; }
+.ak-card-body{
+  display:grid;
+  grid-template-columns:minmax(0,320px) minmax(0,1fr);
+  gap:0;
+  align-items:stretch;
+}
+.ak-card-summary{
+  padding:20px 22px;
+  border-right:1px dashed #eef2f5;
+  display:flex; flex-direction:column; justify-content:flex-start;
+  min-width:0;
+}
+.ak-card-summary h4{
+  margin:0 0 10px; font-size:12px; letter-spacing:2px;
+  color:#9aa5b1; font-weight:600;
+}
+.ak-card-summary p{
+  margin:0; font-size:13.5px; line-height:1.95; color:#5a6773;
+  word-break:break-word;
+}
+.ak-card-cover{
+  position:relative; display:block; overflow:hidden;
+  min-height:190px;
+  border-radius:0 16px 16px 0;
+  text-decoration:none;
+}
+.ak-card-cover img{
+  width:100%; height:100%; min-height:190px;
+  object-fit:cover; display:block;
+  transition:transform .5s ease;
+}
+.ak-card:hover .ak-card-cover img{ transform:scale(1.04); }
+.ak-card-shade{
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,.55) 100%);
+}
+.ak-card-title{
+  position:absolute; left:20px; right:20px; bottom:16px;
+  margin:0; color:#fff; font-size:17px; line-height:1.5; font-weight:600;
+  text-shadow:0 2px 12px rgba(0,0,0,.45);
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+@media (max-width:860px){
+  .ak-card-body{ grid-template-columns:1fr; }
+  .ak-card-summary{ border-right:none; border-bottom:1px dashed #eef2f5; padding:16px 18px; }
+  .ak-card-cover{ border-radius:0 0 16px 16px; min-height:170px; }
+  .ak-card-title{ font-size:15px; }
+}
+
+/* ===== 说说 / 动态卡片 ===== */
+.ak-moment{
+  margin:0 0 26px; padding:20px 24px;
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(255,255,255,.9);
+  border-radius:16px;
+  box-shadow:0 2px 22px -8px #e6e9ee;
+}
+.ak-moment-head{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.ak-moment-ava{ position:relative; flex:0 0 46px; }
+.ak-moment-ava img{
+  width:46px; height:46px; border-radius:50%; object-fit:cover;
+  border:2px solid #fff; box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+.ak-lv{
+  position:absolute; left:-4px; bottom:-4px;
+  background:linear-gradient(135deg,#6fd3f7,#3fa9e0);
+  color:#fff; font-size:10px; font-weight:700;
+  padding:1px 5px; border-radius:6px;
+  border:1.5px solid #fff;
+}
+.ak-moment-who{ display:flex; align-items:baseline; gap:12px; min-width:0; flex:1; }
+.ak-moment-name{ font-size:15px; font-weight:600; color:#3a4452; }
+.ak-moment-sub{
+  font-size:13px; color:#8a96a3;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.ak-moment-right{ display:flex; gap:14px; font-size:12.5px; color:#9aa5b1; flex:0 0 auto; }
+.ak-moment-right .m{ display:inline-flex; align-items:center; gap:4px; }
+.ak-moment-right .iconfont{ font-size:13px; }
+.ak-moment-body{ font-size:14.5px; line-height:2; color:#3f4c59; }
+.ak-moment-body p{ margin:0 0 10px; }
+.ak-moment-body img{
+  max-width:100%; height:auto; border-radius:10px; margin:8px 0;
+  box-shadow:0 2px 14px rgba(0,0,0,.06);
+}
+.ak-moment-foot{
+  margin-top:14px; padding-top:12px; border-top:1px dashed #eef2f5;
+  font-size:12px; color:#9aa5b1;
+}
+.ak-moment-foot .sep{ margin:0 7px; color:#d8dfe6; }
+@media (max-width:768px){
+  .ak-moment{ padding:16px 16px; }
+  .ak-moment-sub{ display:none; }
+  .ak-moment-right{ gap:10px; font-size:12px; }
+}
+
+/* ===== 首页 banner 放大（覆盖原尺寸） ===== */
+.focusinfo .header-tou img,
+.focusinfo .header-tou a img{
+  width:132px !important;
+  height:132px !important;
+  border-radius:50%;
+  border:3px solid rgba(255,255,255,.75);
+  box-shadow:0 8px 32px rgba(0,0,0,.22);
+  transition:transform .3s ease;
+}
+.focusinfo .header-tou img:hover{ transform:scale(1.04); }
+
+.focusinfo .ak-focus-card{
+  padding:28px 52px 24px !important;
+  border-radius:20px !important;
+  margin-top:24px !important;
+}
+.focusinfo .ak-slogan{
+  font-size:18px !important;
+  letter-spacing:3px !important;
+  margin-bottom:18px !important;
+}
+.focusinfo .ak-focus-card .top-social{ gap:18px !important; }
+.focusinfo .ak-focus-card .top-social img{
+  width:30px !important;
+  height:30px !important;
+}
+@media (max-width:768px){
+  .focusinfo .header-tou img,
+  .focusinfo .header-tou a img{ width:96px !important; height:96px !important; }
+  .focusinfo .ak-focus-card{ padding:20px 22px 16px !important; }
+  .focusinfo .ak-slogan{ font-size:14.5px !important; letter-spacing:1px !important; }
+  .focusinfo .ak-focus-card .top-social img{ width:26px !important; height:26px !important; }
+}
+
+/* ===== ak-mobile-fix: 移动端适配 ===== */
+@media (max-width:860px){
+  /* 文章卡片：改成上下堆叠，摘要不再被裁切 */
+  .ak-card-body{
+    display:block !important;
+    grid-template-columns:none !important;
+  }
+  .ak-card-summary{
+    border-right:none !important;
+    border-bottom:1px dashed #eef2f5;
+    padding:16px 18px !important;
+    height:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+  .ak-card-summary p{
+    display:-webkit-box;
+    -webkit-line-clamp:5;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+    font-size:13px;
+    line-height:1.9;
+  }
+  .ak-card-cover{
+    min-height:200px !important;
+    border-radius:0 0 16px 16px !important;
+  }
+  .ak-card-cover img{ min-height:200px !important; }
+  .ak-card-title{
+    font-size:16px !important;
+    left:16px; right:16px; bottom:14px;
+  }
+  .ak-card{ margin:0 0 22px; border-radius:14px; }
+
+  /* meta 条：紧凑布局 */
+  .ak-card-meta{
+    padding:10px 14px !important;
+    gap:4px 12px !important;
+    font-size:12px !important;
+  }
+
+  /* 说说卡片 */
+  .ak-moment{ padding:16px 16px !important; border-radius:14px; }
+  .ak-moment-head{ gap:10px; margin-bottom:12px; }
+  .ak-moment-ava{ flex:0 0 40px; }
+  .ak-moment-ava img{ width:40px; height:40px; }
+  .ak-moment-name{ font-size:14px; }
+  .ak-moment-sub{ display:none; }
+  .ak-moment-right{ gap:10px; font-size:11.5px; }
+  .ak-moment-body{ font-size:14px; line-height:1.9; }
+  .ak-moment-body img{ border-radius:8px; }
+
+  /* 首页 banner */
+  .focusinfo .ak-focus-card{
+    padding:20px 22px 16px !important;
+    border-radius:16px !important;
+    margin-top:16px !important;
+    max-width:calc(100vw - 56px);
+    box-sizing:border-box;
+  }
+  .focusinfo .ak-slogan{
+    font-size:14.5px !important;
+    letter-spacing:1px !important;
+    line-height:1.9 !important;
+  }
+
+  /* 文章正文：移动端图片不溢出 */
+  .entry-content img{ max-width:100%; height:auto; }
+
+  /* 页尾紧凑 */
+  .ak-footer{ padding:26px 14px 22px !important; line-height:1.9; }
+  .ak-footer-quote{ font-size:13px !important; }
+}
+
+/* ===== ak-mobile-hide-summary: 移动端隐藏摘要面板 ===== */
+@media (max-width:860px){
+  .ak-card .ak-card-summary{ display:none !important; }
+  .ak-card-cover{
+    border-radius:0 0 14px 14px !important;
+    min-height:210px !important;
+  }
+  .ak-card-cover img{ min-height:210px !important; }
+  .ak-card-meta{
+    border-bottom:none !important;
+    padding:10px 14px 8px !important;
+  }
+}
+
+/* ===== ak-mobile-banner: 移动端保留头图 banner ===== */
+@media (max-width:860px){
+  .headertop{
+    display:block !important;
+    margin-top:0 !important;
+    overflow:visible !important;
+  }
+  #centerbg{
+    display:block !important;
+    height:360px !important;
+    background-size:cover !important;
+    background-position:center center !important;
+    background-repeat:no-repeat !important;
+  }
+  .focusinfo{
+    display:block !important;
+    position:relative !important;
+    top:0 !important;
+    margin:0 auto !important;
+    padding:52px 12px 0 !important;
+    max-width:100% !important;
+    text-align:center;
+  }
+  .focusinfo .header-tou{
+    display:inline-block !important;
+    margin:0 0 6px !important;
+  }
+  .focusinfo .header-tou img,
+  .focusinfo .header-tou a img{
+    width:92px !important;
+    height:92px !important;
+    border:3px solid rgba(255,255,255,.7) !important;
+  }
+  .focusinfo .ak-focus-card{
+    display:inline-block !important;
+    margin-top:12px !important;
+    padding:16px 20px 12px !important;
+    max-width:calc(100vw - 48px) !important;
+  }
+  .focusinfo .ak-slogan{
+    font-size:13.5px !important;
+    letter-spacing:1px !important;
+    margin-bottom:12px !important;
+    line-height:1.8 !important;
+  }
+  .focusinfo .ak-focus-card .top-social img{
+    width:28px !important;
+    height:28px !important;
+  }
+  /* 让下面内容正常衔接 */
+  .site-main{ padding-top:0 !important; }
+  .blank{ display:none !important; }
+}
+
+/* ===== ak-mobile-banner-v2: 覆盖上一版，修正布局 ===== */
+@media (max-width:860px){
+  .headertop{
+    display:block !important;
+    margin-top:0 !important;
+    overflow:visible !important;
+    height:auto !important;
+  }
+  #centerbg{
+    height:430px !important;
+    min-height:430px !important;
+    background-size:cover !important;
+    background-position:center center !important;
+    display:block !important;
+  }
+  .focusinfo{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    position:relative !important;
+    top:0 !important;
+    margin:0 !important;
+    padding:64px 16px 0 !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+    text-align:center !important;
+  }
+  .focusinfo .header-tou{
+    display:block !important;
+    margin:0 0 14px 0 !important;
+    padding:0 !important;
+    top:auto !important;
+    position:relative !important;
+    flex:0 0 auto !important;
+  }
+  .focusinfo .header-tou img,
+  .focusinfo .header-tou a img{
+    width:96px !important;
+    height:96px !important;
+    margin:0 !important;
+    border:3px solid rgba(255,255,255,.75) !important;
+    box-shadow:0 8px 28px rgba(0,0,0,.25) !important;
+  }
+  .focusinfo .ak-focus-card{
+    display:block !important;
+    width:calc(100vw - 64px) !important;
+    max-width:420px !important;
+    margin:0 auto !important;
+    padding:18px 18px 14px !important;
+    box-sizing:border-box !important;
+    border-radius:16px !important;
+  }
+  .focusinfo .ak-slogan{
+    display:block !important;
+    font-size:13px !important;
+    line-height:1.85 !important;
+    letter-spacing:.5px !important;
+    margin:0 0 14px 0 !important;
+    word-break:break-word !important;
+  }
+  .focusinfo .ak-focus-card .top-social{
+    display:flex !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:16px !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+  .focusinfo .ak-focus-card .top-social li{
+    margin:0 !important;
+    padding:0 !important;
+    float:none !important;
+  }
+  .focusinfo .ak-focus-card .top-social img{
+    width:28px !important;
+    height:28px !important;
+    margin:0 !important;
+  }
+  .site-main{ padding-top:0 !important; }
+  .blank{ display:none !important; }
+}
+
+/* ===== ak-mobile-banner-v3: flex 布局，避免头像被裁 ===== */
+@media (max-width:860px){
+  .headertop{
+    display:block !important;
+    margin-top:0 !important;
+    overflow:visible !important;
+    height:auto !important;
+  }
+  #centerbg{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    height:auto !important;
+    min-height:0 !important;
+    padding:76px 0 44px !important;
+    box-sizing:border-box !important;
+    background-size:cover !important;
+    background-position:center !important;
+    background-attachment:scroll !important;
+  }
+  .focusinfo{
+    position:static !important;
+    top:auto !important;
+    left:auto !important;
+    right:auto !important;
+    bottom:auto !important;
+    transform:none !important;
+    margin:0 !important;
+    padding:0 16px !important;
+    max-width:100% !important;
+    width:100% !important;
+    box-sizing:border-box !important;
+    text-align:center !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+  }
+  .focusinfo .header-tou{
+    display:block !important;
+    position:static !important;
+    margin:0 0 16px 0 !important;
+    padding:0 !important;
+    top:auto !important;
+    line-height:0 !important;
+  }
+  .focusinfo .header-tou img,
+  .focusinfo .header-tou a img{
+    display:inline-block !important;
+    width:96px !important;
+    height:96px !important;
+    margin:0 !important;
+    border:3px solid rgba(255,255,255,.75) !important;
+    box-shadow:0 8px 28px rgba(0,0,0,.25) !important;
+  }
+  .focusinfo .ak-focus-card{
+    display:block !important;
+    width:calc(100vw - 64px) !important;
+    max-width:400px !important;
+    margin:0 auto !important;
+    padding:18px 16px 14px !important;
+    box-sizing:border-box !important;
+    border-radius:16px !important;
+  }
+  .focusinfo .ak-slogan{
+    display:block !important;
+    font-size:13px !important;
+    line-height:1.85 !important;
+    letter-spacing:.5px !important;
+    margin:0 0 14px 0 !important;
+    word-break:break-word !important;
+  }
+  .focusinfo .ak-focus-card .top-social{
+    display:flex !important;
+    justify-content:center !important;
+    gap:16px !important;
+    margin:0 !important;
+    padding:0 !important;
+    list-style:none !important;
+  }
+  .focusinfo .ak-focus-card .top-social li{
+    float:none !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+  .focusinfo .ak-focus-card .top-social img{
+    width:28px !important;
+    height:28px !important;
+  }
+  .site-main{ padding-top:0 !important; }
+  .blank{ display:none !important; }
+}
+
+/* ===== ak-card-center: 毛玻璃卡片内容居中 ===== */
+.focusinfo .ak-focus-card{
+  text-align:center !important;
+}
+.focusinfo .ak-focus-card .ak-slogan,
+.focusinfo .ak-slogan{
+  text-align:center !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+.focusinfo .ak-focus-card .top-social{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+  text-align:center !important;
+  margin:0 auto !important;
+  padding:0 !important;
+  list-style:none !important;
+  width:auto !important;
+}
+.focusinfo .ak-focus-card .top-social li{
+  float:none !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+
+/* ===== ak-card-center2: 干掉 ul 的 float ===== */
+.focusinfo .ak-focus-card ul.top-social,
+.focusinfo ul.top-social,
+ul.top-social{
+  float:none !important;
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;
+  justify-content:center !important;
+  align-items:center !important;
+  width:100% !important;
+  max-width:100% !important;
+  margin:0 auto !important;
+  padding:0 !important;
+  list-style:none !important;
+  text-align:center !important;
+}
+.focusinfo .ak-focus-card ul.top-social li,
+.focusinfo ul.top-social li,
+ul.top-social li{
+  float:none !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:auto !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+.focusinfo .ak-focus-card ul.top-social li:first-child{ margin-left:0 !important; }
+.focusinfo .ak-focus-card ul.top-social li:last-child{ margin-right:0 !important; }

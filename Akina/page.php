@@ -54,7 +54,14 @@
 					<?php
 						$pattern = '/\<img.*?src\=\"(.*?)\"[^>]*>/i';
 						$replacement = '<a href="$1" alt="'.$this->title.'" title="点击放大图片"><img class="aligncenter" src="$1" title="'.$this->title.'"></a>';
-						echo preg_replace($pattern, $replacement, $this->content);
+						if ('apply' === $this->slug && class_exists('AkLinks_Plugin')) {
+                            echo AkLinks_Plugin::renderApplyForm();
+                        } elseif ('links' === $this->slug && class_exists('AkLinks_Plugin')) {
+                            // 友情链接页：交给 AkLinks 插件渲染卡片墙
+                            echo AkLinks_Plugin::render();
+                        } else {
+                            echo preg_replace($pattern, $replacement, $this->content);
+                        }
 					?>
 				</div>
 			</article>

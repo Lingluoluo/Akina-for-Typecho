@@ -1,4 +1,20 @@
-<?php if (!defined('__TYPECHO_ROOT_DIR__')) exit;
+<?php
+
+if (!function_exists('ak_local')) {
+    /**
+     * 读取 local.php 里的站点个人配置（不入版本控制）
+     */
+    function ak_local($key, $default = '')
+    {
+        static $conf = null;
+        if ($conf === null) {
+            $f = __DIR__ . '/local.php';
+            $conf = is_file($f) ? (array) include $f : array();
+        }
+        return isset($conf[$key]) && $conf[$key] !== '' ? $conf[$key] : $default;
+    }
+}
+ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 define("THEME_URL", $this->options->themeUrl);
 	if(!empty(Helper::options()->CDNURL)){
 		$theurl = Helper::options()->CDNURL.'/usr/themes/Akina/';
@@ -23,7 +39,8 @@ define("theprofile", authorProfile($this->options->profile,theurl));
 	<?php echo '
 	<link rel="shortcut icon" href="'.theurl.'images/favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="'.theurl.'css/style.css" type="text/css" />
-	<link rel="stylesheet" href="'.theurl.'css/OwO.css" type="text/css" />';
+	<link rel="stylesheet" href="'.theurl.'css/OwO.css" type="text/css" />
+	<link rel="stylesheet" href="'.theurl.'css/custom.css" type="text/css" />';
 	if (!empty($this->options->menu) && in_array('dark', $this->options->menu)) {
 		echo '<link rel="stylesheet" href="'.theurl.'css/dark.css" type="text/css" />';
 	}
@@ -88,6 +105,8 @@ define("theprofile", authorProfile($this->options->profile,theurl));
 		<div class="lower">
 			<nav>
 				<ul class="menu"><li class="current-menu-item"><a href="<?php $this->options ->siteUrl(); ?>">首页</a></li>
+				<li><a href="<?php echo \Widget\Options::alloc()->siteUrl; ?>about/">关于本博客</a></li>
+				<li><a href="<?php echo ak_local('personal_url', '#'); ?>" target="_blank" rel="noopener">关于我</a></li>
 				<li><a href="#">分类</a>
 				<ul class="sub-menu">
 					<?php $this->widget('Widget_Metas_Category_List')->parse('<li><a href="{permalink}">{name}</a></li>'); ?>
@@ -97,6 +116,7 @@ define("theprofile", authorProfile($this->options->profile,theurl));
 				<ul class="sub-menu">
 					<?php $this->widget('Widget_Contents_Page_List')->to($pages); ?>
 					<?php while($pages->next()): ?>
+						<?php if ($pages->slug === 'about') continue; ?>
 						<li><a href="<?php $pages->permalink(); ?>"><?php $pages->title(); ?></a></li>
 					<?php endwhile; ?>
 				</ul>

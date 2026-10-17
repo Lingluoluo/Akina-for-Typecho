@@ -97,11 +97,19 @@ if($this->options->sticky){
 					<div class="header-tou" >
 					<a href="<?php $this->options ->siteUrl(); ?>"><img src="<?php echo theprofile ?>"></a>
 					</div>
-					<!-- 简介 -->
-					<div class="header-info">
-					<p><?php $this->options->headerinfo() ?></p>
-					</div>
-					<!-- 社交信息 -->
+					<?php
+                        // 标语、社交、邮箱、小红书全都为空时，整个卡片不渲染
+                        $__slogan = trim((string)$this->options->headerinfo);
+                        $__hasSocial = false;
+                        foreach (array('SINA','Wechat','QQnum','coolapk','Qzone','Github','Bilibili','Music') as $__k) {
+                            if ($this->options->{$__k}) { $__hasSocial = true; break; }
+                        }
+                        if (ak_local('xiaohongshu') || ak_local('email')) { $__hasSocial = true; }
+                        $__hasCard = ($__slogan !== '' || $__hasSocial);
+                    ?>
+                    <?php if ($__hasCard): ?>
+                    <div class="ak-focus-card">
+					<?php if ($__slogan !== ''): ?><p class="ak-slogan"><?php $this->options->headerinfo() ?></p><?php endif; ?>
 					<ul class="top-social">
 						<?php
 							//微博
@@ -141,111 +149,83 @@ if($this->options->sticky){
 								echo '<li><a href="https://music.163.com/#/user/home?id='.$this->options->Music.'" target="_blank" rel="nofollow" class="social-bilibili"><img src="'.theurl.'images/music.png"/></a></li>';
 							}
 						?>
-					<ul>
+						<?php if (ak_local('xiaohongshu')): ?><li><a href="<?php echo ak_local('xiaohongshu'); ?>" target="_blank" rel="nofollow noopener" class="social-xiaohongshu" title="小红书"><img src="<?php echo theurl; ?>images/xiaohongshu.svg" alt="小红书"></a></li><?php endif; ?>
+						<?php if (ak_local('email')): ?><li><a href="mailto:<?php echo ak_local('email'); ?>" class="social-mail" title="<?php echo ak_local('email'); ?>"><img src="<?php echo theurl; ?>images/mail.svg" alt="邮箱"></a></li><?php endif; ?>
+					</ul>
+                    <?php endif; ?>
 				</div>
 			</div>
 			<!-- 首页大图结束 -->
 		</div>
 	<div class=""></div>
 	<div id="content" class="site-content">
-	<!-- 顶部公告内容 -->
-	<div class="notice">
-		<i class="iconfont">&#xe607;</i>
-			<div class="notice-content">
-			<?php $this->options->NOTICE();?>
-			</div>
-	</div>
-	<!-- 聚焦内容 -->
-	<div class="top-feature">
-		<h1 class="fes-title">聚焦</h1>
-			<ul class="feature-content">
-			<?php
-			    // 默认数据
-				$defaultUrl = ['https://zhebk.cn/Web/Akina.html','https://zhebk.cn/Web/userAkina.html','https://zhebk.cn/archives.html'];
-				$defaultTitle = ['Akina','使用说明','文章归档'];
-			    // 整理
-				$featureCid = array_filter(explode(',', strtr($this->options->featureCids, ' ', ',')));
-				// 循环输出
-				for($i=0;$i<count($featureCid);$i++){
-				    $featureNum = $i + 1;
-					$this->widget('Widget_Archive@lunbo'.$i, 'pageSize=1&type=single', 'cid='.$featureCid[$i])->to($ji);
-                    if ($ji->fields->thumbnail){
-						$featureImg = $ji->fields->thumbnail;
-					} else {
-						$featureImg = theurl.'images/postbg/'.$featureNum.'.jpg';
-					}
-					echo '<li class="feature-'.$featureNum.'"><a href="'.$ji->permalink.'"><div class="feature-title"><span class="foverlay">'.$ji->title.'</span></div><img src="'.$featureImg.'"></a></li>';
-					if( $featureNum == 3 ) {
-					    break;
-					}
-				}
-				for($i = count($featureCid); $i < 3; $i++) {
-				    $addNum = $i + 1;
-					echo '<li class="feature-'.$addNum.'"><a href="'.$defaultUrl[$i].'"><div class="feature-title"><span class="foverlay">'.$defaultTitle[$i].'</span></div><img src="'.theurl.'/images/feature/feature'.$addNum.'.jpg"></a></li>';
-				}
-			?>
-			</ul>
-	</div>
-	<!-- 主页内容 -->
 	<div id="primary" class="content-area">
 		<main id="main" class="site-main indexMain" role="main">
-		<h1 class="main-title">近况</h1>
+		<h1 class="main-title">文章</h1>
 <!-- 结束搜索判断 -->
 <?php endif; ?>
 		<!-- 开始文章循环输出 -->
     <?php $deuIndex = 1; ?>
 		<?php while($this->next()): ?>
-		<article class="post post-list" itemscope="" itemtype="http://schema.org/BlogPosting">
-		<!-- 判断文章输出样式, 同时兼容南博动态插件 -->
-		<?php if ($this->fields->dtMode || $this->type == 'dynamic'): ?>
-		<div class="post-status">
-			<div class="postava">
-				<a href="<?php $this->permalink() ?>"><img alt="avatar" src="<?php echo theprofile ?>" srcset="<?php echo theprofile ?> 2x" class="avatar avatar-64 photo" height="64" width="64"></a>
+		<article class="post post-list<?php echo ($this->fields->dtMode || $this->type == 'dynamic') ? ' ak-moment' : ' ak-card'; ?>" itemscope="" itemtype="http://schema.org/BlogPosting">
+<?php if ($this->fields->dtMode || $this->type == 'dynamic'): ?>
+			<?php
+				$__cmt = (int)$this->commentsNum;
+			?>
+			<div class="ak-moment-head">
+				<div class="ak-moment-ava">
+					<a href="<?php $this->permalink() ?>"><img src="<?php echo theprofile; ?>" alt="avatar"></a>
+					<span class="ak-lv">LV<?php echo max(1, min(6, (int)ceil($__cmt / 5) + 1)); ?></span>
+				</div>
+				<div class="ak-moment-who">
+					<span class="ak-moment-name"><?php $this->author(); ?></span>
+					<span class="ak-moment-sub"><?php $this->title(); ?></span>
+				</div>
+				<div class="ak-moment-right">
+					<span class="m"><i class="iconfont">&#xe610;</i><?php echo $__cmt; ?></span>
+					<span class="m"><i class="iconfont">&#xe604;</i><?php $this->date('Y-m-d H:i'); ?></span>
+				</div>
 			</div>
-			<div class="s-content">
-				<a href="<?php $this->permalink() ?>">
-				<p><?php $this->excerpt(70, '...'); ?></p>
-				<div class="s-time"><i class="iconfont">&#xe604;</i><?php $this->date('Y-n-j'); ?><?php if(Postviews($this)>=2000) echo"<i class='iconfont hotpost' style='margin-left: 5px;'>&#xe618;</i>" ?>
-</div>
+			<div class="ak-moment-body">
+				<?php $this->content(); ?>
+			</div>
+			<div class="ak-moment-foot">
+				<a href="<?php $this->permalink() ?>"><?php $this->title(); ?></a>
+				<span class="sep">|</span>
+				<?php $this->author(); ?>
+				<span class="sep">|</span>
+				<?php $this->category(' / '); ?>
+			</div>
+<?php else: ?>
+			<?php
+				$__words  = mb_strlen(strip_tags($this->content), 'UTF-8');
+				$__mins   = max(1, (int)ceil($__words / 300));
+				$__excerpt = trim(preg_replace('/\s+/u', ' ', strip_tags($this->content)));
+				$__excerpt = mb_substr($__excerpt, 0, 120, 'UTF-8');
+				$__cover = '';
+				if ($this->fields->icon) { $__cover = $this->fields->icon; }
+				if (!$__cover && $this->fields->thumbnail) { $__cover = $this->fields->thumbnail; }
+				if (!$__cover) { $__cover = theurl . 'images/postbg/' . (($this->cid % 3) + 1) . '.jpg'; }
+			?>
+			<div class="ak-card-meta">
+				<span class="m"><i class="iconfont">&#xe604;</i>发布于 <?php $this->date('Y-m-d'); ?></span>
+				<span class="m"><i class="iconfont">&#xe614;</i><?php echo Postviews($this); ?> 热度</span>
+				<span class="m"><?php $this->category(' / '); ?></span>
+				<span class="m"><?php echo $__words; ?> 字</span>
+				<span class="m"><?php echo $__mins; ?> 分钟</span>
+			</div>
+			<div class="ak-card-body">
+				<div class="ak-card-summary">
+					<h4>摘要</h4>
+					<p><?php echo htmlspecialchars($__excerpt); ?>&hellip;</p>
+				</div>
+				<a class="ak-card-cover" href="<?php $this->permalink() ?>">
+					<img src="<?php echo $__cover; ?>" alt="<?php $this->title() ?>" loading="lazy">
+					<div class="ak-card-shade"></div>
+					<h2 class="ak-card-title"><?php $this->sticky(); ?><?php $this->title() ?></h2>
 				</a>
 			</div>
-			<footer class="entry-footer">
-		<?php else: ?>
-			<div class="post-entry">
-				<div class="feature">
-					<a href="<?php $this->permalink() ?>"><div class="overlay"><i class="iconfont">&#xe61e;</i></div>
-            <img src="<?php 
-              if(array_key_exists('icon',unserialize($this->___fields())) & $this->fields->icon != null) {
-                $this->fields->icon();
-                } else {
-                  if ($deuIndex > 7) {$deuIndex = 1;}
-                  echo theurl.'images/random/deu'.$deuIndex++.'.jpg';
-                }
-            ?>">
-          </a>
-				</div>
-				<h1 class="entry-title"><a href="<?php $this->permalink() ?>"><?php $this->sticky(); $this->title() ?></a></h1>
-				<div class="p-time">
-				<i class="iconfont">&#xe604;</i> <?php $this->date('Y-n-j'); ?><?php if(Postviews($this)>=2000) echo"<i class='iconfont hotpost' style='margin-left: 5px;'>&#xe618;</i>" ?>
-				</div>
-				<a href="<?php $this->permalink() ?>"><p><?php $this->excerpt(70, '...'); ?></p></a>
-				<!-- 文章下碎碎念 -->
-				<footer class="entry-footer">
-					<div class="post-more">
-							<a href="<?php $this->permalink() ?>"><i class="iconfont">&#xe61c;</i></a>
-					</div>
-		<?php endif; ?>
-					<div class="info-meta">
-						<div class="comnum">
-							<span><i class="iconfont">&#xe610;</i><a href="<?php $this->permalink() ?>"><?php $this->commentsNum(_t('NOTHING'), _t('1条评论'), _t('%d条评论')); ?></a></span>
-						</div>
-						<div class="views">
-							<span><i class="iconfont">&#xe614;</i><?php echo Postviews($this)>=10000 ? round(Postviews($this)/10000,1) .'万' : Postviews($this);?> 热度</span>
-						</div>
-					</div>
-				</footer>
-			</div>
-				<hr>
+<?php endif; ?>
 		</article>
 		<?php endwhile; ?>
 		<!-- 结束文章循环输出 -->

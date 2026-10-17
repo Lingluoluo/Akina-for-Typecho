@@ -107,14 +107,6 @@
 				</ul>
 				<i class="iconfont show-share">&#xe60c;</i>
 			</div>
-			<!-- 赞助按钮 -->
-			<div class="donate">
-			<a>赏</a>
-				<ul class="donate_inner">
-					<li class="wedonate"><img src="<?php echo authorProfile($this->options->wedo,theurl);?>"></li>
-					<li class="alidonate"><img src="<?php echo authorProfile($this->options->alido,theurl);?>"></li>
-				</ul>
-			</div>
 			<!-- 文章标签 -->
 			<div class="post-tags">
 				<i class="iconfont">&#xe602;</i>
@@ -126,9 +118,36 @@
 			</div>
 		</footer>
 		</article>
+
+<script id="ak-copy-notice">
+(function () {
+    var box = document.querySelector('.entry-content');
+    if (!box) return;
+    var title = <?php echo json_encode($this->title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
+    var link  = <?php echo json_encode($this->permalink, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
+    box.addEventListener('copy', function (e) {
+        var sel = '';
+        try { sel = window.getSelection().toString(); } catch (err) { sel = ''; }
+        if (!sel || sel.length < 8) return;              // 复制太短就不加
+        var tail = '\n\n'
+            + '————————————————\n'
+            + '本文来自 雨落落的小窝\n'
+            + '原文标题：' + title + '\n'
+            + '原文链接：' + link + '\n'
+            + '本文采用 CC BY-NC-SA 4.0 协议授权，转载请注明出处';
+        if (e.clipboardData) {
+            e.clipboardData.setData('text/plain', sel + tail);
+            e.preventDefault();
+        } else if (window.clipboardData) {
+            window.clipboardData.setData('Text', sel + tail);
+            e.returnValue = false;
+        }
+    });
+})();
+</script>
 		<!-- 版权声明 -->
 		<div class="open-message">
-			<p>声明：<?php $this->options->title() ?>|版权所有，违者必究|如未注明，均为原创|本网站采用<a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" target="_blank">BY-NC-SA</a>协议进行授权</p>
+			<p>声明：<?php $this->options->title() ?>|版权所有，违者必究|如未注明，均为原创|本网站内容采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="license noopener">CC BY-NC-SA 4.0 署名-非商业性使用-相同方式共享</a> 协议进行授权</p>
 			<p>转载：转载请注明原文链接 - <a href="<?php $this->permalink(); ?>"><?php $this->title() ?></a></p>	
 		</div>
 		<!-- 相邻文章 -->

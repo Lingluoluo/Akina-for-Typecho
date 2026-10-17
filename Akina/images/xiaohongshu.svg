@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <circle cx="24" cy="24" r="23" fill="#ff2442"/>
+  <rect x="12" y="15" width="24" height="18" rx="4" fill="#fff" opacity=".95"/>
+  <text x="24" y="29.5" font-size="11" font-family="PingFang SC,Microsoft YaHei,sans-serif"
+        font-weight="700" fill="#ff2442" text-anchor="middle">小红书</text>
+</svg>

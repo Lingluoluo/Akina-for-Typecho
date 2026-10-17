@@ -1,0 +1,29 @@
+<?php
+/**
+ * 站点本地配置（模板）
+ *
+ * 复制为 local.php 并填入自己的信息。local.php 已被 .gitignore 忽略，
+ * 不会被提交到公开仓库。
+ */
+return array(
+    // 萌 ICP 备案号（留空则不显示）
+    'moe_icp_id'   => '',
+    'moe_icp_url'  => '',
+
+    // 联系邮箱（页尾 + 社交图标，留空则不显示）
+    'email'        => '',
+
+    // 个人主页（导航「关于我」）
+    'personal_url' => '',
+
+    // 小红书主页
+    'xiaohongshu'  => '',
+
+    // 页尾：是否显示「萌ICP / 异次元之旅」
+    'show_moe_icp' => true,
+
+    // 页尾：是否显示建站运行时长
+    'show_uptime'  => true,
+    // 建站起始日期（Y-m-d）
+    'start_date'   => '2019-05-25',
+);

@@ -236,9 +236,10 @@ function getNextPrev($mode, $archive){
             $link = $content['permalink'];
         } else {
             try {
-                $link = \Typecho\Router::url($archive->type, $content, $archive->options->index);
+                $__opt = \Widget\Options::alloc();
+                $link = \Typecho\Router::url($archive->type, $content, $__opt->index);
             } catch (\Throwable $e) {
-                $link = $archive->options->siteUrl;
+                $link = '';
             }
         }
 

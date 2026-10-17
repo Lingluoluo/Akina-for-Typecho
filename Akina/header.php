@@ -22,7 +22,9 @@ define("THEME_URL", $this->options->themeUrl);
 		$theurl = THEME_URL.'/';
 	}
 define("theurl",$theurl);
-define("theprofile", authorProfile($this->options->profile,theurl));
+define("theprofile", $this->options->profile
+    ? authorProfile($this->options->profile, theurl)
+    : theurl . 'images/default-avatar.svg');
 ?>
 <!DOCTYPE HTML>
 <html lang="zh-CN">
@@ -62,7 +64,8 @@ define("theprofile", authorProfile($this->options->profile,theurl));
 		</div>
 			<!-- logo则显示 -->
 			<div class="site-branding">
-			 <div class="site-title"><a href="<?php $this->options ->siteUrl(); ?>" ><img src="<?php echo authorProfile($this->options->logo,theurl);?>"></a></div>		  
+<?php if ($this->options->logo): ?>			 <div class="site-title"><a href="<?php $this->options ->siteUrl(); ?>" ><img src="<?php echo authorProfile($this->options->logo,theurl);?>"></a></div>		  
+<?php endif; ?>
 			</div>
 			<!-- logo 结束 -->
 	 </div>	
@@ -72,7 +75,8 @@ define("theprofile", authorProfile($this->options->profile,theurl));
 	<div class="site-top">
 		<!-- logo则显示 -->
 		<div class="site-branding">
-		<div class="site-title"><a href="<?php $this->options ->siteUrl(); ?>" ><img src="<?php echo authorProfile($this->options->logo,theurl);?>"></a></div>		  
+<?php if ($this->options->logo): ?>		<div class="site-title"><a href="<?php $this->options ->siteUrl(); ?>" ><img src="<?php echo authorProfile($this->options->logo,theurl);?>"></a></div>		  
+<?php endif; ?>
 		</div>
 		<!-- logo 结束 -->
 		<div id="login-reg">

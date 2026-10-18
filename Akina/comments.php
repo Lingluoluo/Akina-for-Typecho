@@ -220,7 +220,7 @@ function ak_comment_env($coid) {
 					<?php if (isset($_GET['ccap']) && $_GET['ccap'] === 'fail'): ?>
 					<p class="ak-ccap-msg">验证码错误，请重试</p>
 					<?php endif; ?>
-					<?php echo ak_comment_captcha_fields(); ?>
+					<span id="ak-ccap-box"><?php echo ak_comment_captcha_fields(); ?></span>
 					<?php endif; ?>
 					<div class="com-footer">
 						<input class="submit" name="submit" type="submit" id="submit" tabindex="5" value="发表评论" />

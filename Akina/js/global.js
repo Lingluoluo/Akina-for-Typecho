@@ -71,6 +71,7 @@ var ajaxcomments = function(){
                     }
                 } catch (e) { msg = ""; }
                 if (!msg) { msg = "提交失败，请检查验证码或稍后重试"; }
+                if (msg.indexOf("验证码") !== -1) { akRefreshCaptcha(); }
                 $(document).ready(function(){
                     $.alert("提示",msg);
                 });
@@ -84,6 +85,7 @@ var ajaxcomments = function(){
                     if (plain && plain.indexOf('<') === -1 && plain.length < 200) {
                         $("#submit").val("再次提交");
                         $.alert("提示", plain);
+                        if (plain.indexOf("验证码") !== -1) { akRefreshCaptcha(); }
                         return;
                     }
                 }
@@ -499,3 +501,13 @@ if (doc != null) {
 }
 //版本显示
 console.log("%cAkina for Typecho 4.1.4","background:#A0DAD0;color:#fff;margin:10px;padding:6px;border-radius:3px;","https://zhebk.cn");
+
+// 评论验证码：失败后自动换取新的题目，避免 nonce 一次性导致反复失败
+function akRefreshCaptcha() {
+    const box = document.getElementById('ak-ccap-box');
+    if (!box) return;
+    fetch('/usr/plugins/AkSite/captcha-refresh.php?t=' + Date.now(), { credentials: 'same-origin' })
+        .then(r => r.text())
+        .then(html => { if (html && html.indexOf('ak_ccap') !== -1) { box.innerHTML = html; } })
+        .catch(() => {});
+}

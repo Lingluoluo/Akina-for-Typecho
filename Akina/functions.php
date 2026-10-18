@@ -296,13 +296,15 @@ function get_commentReply_at($coid)
     $db   = Typecho_Db::get();
     $prow = $db->fetchRow($db->select('parent')->from('table.comments')
                                  ->where('coid = ? AND status = ?', $coid, 'approved'));
-    $parent = $prow['parent'];
-    if ($parent != "0") {
+    $parent = $prow ? $prow['parent'] : 0;
+    // 父评论可能已被删除：此时不要输出 "@ : " 这种空前缀
+    if (!empty($parent) && $parent != "0") {
         $arow = $db->fetchRow($db->select('author')->from('table.comments')
                                      ->where('coid = ? AND status = ?', $parent, 'approved'));
-        $author = $arow['author'];
-        $href   = '<a href="#" rel="nofollow" class="cute atreply">@' . $author . '</a> : ';
-        echo $href;
+        $author = $arow ? trim((string)$arow['author']) : '';
+        if ($author !== '') {
+            echo '<a href="#" rel="nofollow" class="cute atreply">@' . htmlspecialchars($author, ENT_QUOTES, 'UTF-8') . '</a> : ';
+        }
     }
 }
 //公安联网备案,获取备案号

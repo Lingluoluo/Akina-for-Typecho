@@ -511,3 +511,31 @@ function akRefreshCaptcha() {
         .then(html => { if (html && html.indexOf('ak_ccap') !== -1) { box.innerHTML = html; } })
         .catch(() => {});
 }
+
+/* ===== ak-reply-fallback: 回复按钮兜底 =====
+ * href='' 会导致点击后整页刷新；这里统一 preventDefault 并调用 Typecho 的 reply()
+ */
+(function () {
+    function bindReply() {
+        if (!window.jQuery) return;
+        jQuery(document).off('click.akreply', '.comment-reply-link')
+            .on('click.akreply', '.comment-reply-link', function (e) {
+                var cid = this.getAttribute('data-cid');
+                var coid = this.getAttribute('data-coid');
+                if (!cid || !coid) return; // 没有标记就交给原有逻辑
+                e.preventDefault();
+                if (window.TypechoComment && typeof TypechoComment.reply === 'function') {
+                    try { return TypechoComment.reply(cid, parseInt(coid, 10), this); }
+                    catch (err) { console.error('reply failed', err); }
+                }
+                var resp = document.getElementById('respond_box');
+                if (resp) resp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindReply);
+    } else {
+        bindReply();
+    }
+})();

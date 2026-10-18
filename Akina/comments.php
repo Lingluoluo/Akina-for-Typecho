@@ -87,6 +87,59 @@ function ak_is_cdn_ip($ip) {
     return $is;
 }
 
+/**
+ * IP 归属地查询（带 preview_geo 缓存）
+ * 表里没有时调用 ip-api.com，成功后写回缓存，避免每次渲染都请求
+ */
+function ak_geo_lookup($ip)
+{
+    static $memo = [];
+    if (isset($memo[$ip])) {
+        return $memo[$ip];
+    }
+    $memo[$ip] = '';
+    if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+        return '';
+    }
+    // 跳过内网/保留地址
+    if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+        return '';
+    }
+    $ctx = stream_context_create([
+        'http' => ['timeout' => 3, 'method' => 'GET'],
+        'ssl'  => ['verify_peer' => false, 'verify_peer_name' => false],
+    ]);
+    $raw = @file_get_contents(
+        'http://ip-api.com/json/' . urlencode($ip) . '?lang=zh-CN&fields=status,country,regionName,city',
+        false,
+        $ctx
+    );
+    if (!$raw) {
+        return '';
+    }
+    $j = json_decode($raw, true);
+    if (!is_array($j) || (isset($j['status']) ? $j['status'] : '') !== 'success') {
+        return '';
+    }
+    $parts = array_filter([
+        isset($j['country']) ? $j['country'] : '',
+        isset($j['regionName']) ? $j['regionName'] : '',
+        isset($j['city']) ? $j['city'] : '',
+    ]);
+    $loc = implode(' ', $parts);
+    if ($loc === '') {
+        return '';
+    }
+    // 写回缓存表
+    try {
+        $db = Typecho_Db::get();
+        $db->query($db->insert('preview_geo')->rows(['ip' => $ip, 'loc' => $loc]));
+    } catch (\Throwable $e) {
+        // 已存在或写失败都不影响展示
+    }
+    return $memo[$ip] = $loc;
+}
+
 function ak_comment_env($coid) {
     static $cache = [];
     if (isset($cache[$coid])) return $cache[$coid];
@@ -99,7 +152,15 @@ function ak_comment_env($coid) {
     $isCdn = false;
     if ($ip) {
         $g = $db->fetchRow($db->select('loc')->from('preview_geo')->where('ip = ?', $ip));
-        if ($g && !empty($g['loc'])) $loc = $g['loc'];
+        if ($g && !empty($g['loc'])) {
+            $loc = $g['loc'];
+        } else {
+            // 缓存未命中 → 在线查询并写回
+            $looked = ak_geo_lookup($ip);
+            if ($looked !== '') {
+                $loc = $looked;
+            }
+        }
         $isCdn = ak_is_cdn_ip($ip);
     }
     $cache[$coid] = [$br, $os, $loc, $isCdn];

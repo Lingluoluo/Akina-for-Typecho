@@ -78,6 +78,15 @@ var ajaxcomments = function(){
                 return false;
             },
             success: function(data) { //成功取到数据
+                // 服务端返回纯文本（如验证码错误）时直接弹窗，不做评论插入
+                if (typeof data === 'string') {
+                    const plain = data.trim();
+                    if (plain && plain.indexOf('<') === -1 && plain.length < 200) {
+                        $("#submit").val("再次提交");
+                        $.alert("提示", plain);
+                        return;
+                    }
+                }
                 try {
                     new_id = $(comment_list, data).html().match(/id=\"?comment-\d+/g).join().match(/\d+/g).sort(function(a, b) {
                         return a - b

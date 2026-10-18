@@ -645,3 +645,26 @@ ul.top-social li{
 }
 .focusinfo .ak-focus-card ul.top-social li:first-child{ margin-left:0 !important; }
 .focusinfo .ak-focus-card ul.top-social li:last-child{ margin-right:0 !important; }
+
+/* ===== ak-author-info-expanded: 评论者信息默认展开 ===== */
+#comment-author-info {
+    display: block !important;
+    margin-top: 12px;
+}
+/* 展开后「Welcome back / 修改 ↓」这行提示就没意义了，隐藏 */
+#respond_box .author-updown {
+    display: none !important;
+}
+/* 三个输入框并排更好看 */
+@media (min-width: 700px) {
+    #comment-author-info {
+        display: flex !important;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    #comment-author-info input.commenttext {
+        flex: 1 1 calc(33.33% - 10px);
+        min-width: 180px;
+        margin: 0;
+    }
+}

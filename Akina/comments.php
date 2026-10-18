@@ -216,6 +216,12 @@ function ak_comment_env($coid) {
 					<div class="clear"></div>
 					<?php endif; ?>
 					<p><textarea name="text" id="comment" class="OwO-textarea" placeholder="come on baby !" tabindex="4" cols="50" rows="5"></textarea></p>
+					<?php if (!$this->user->hasLogin() && function_exists('ak_comment_captcha_fields')): ?>
+					<?php if (isset($_GET['ccap']) && $_GET['ccap'] === 'fail'): ?>
+					<p class="ak-ccap-msg">验证码错误，请重试</p>
+					<?php endif; ?>
+					<?php echo ak_comment_captcha_fields(); ?>
+					<?php endif; ?>
 					<div class="com-footer">
 						<input class="submit" name="submit" type="submit" id="submit" tabindex="5" value="发表评论" />
 						<input type='hidden' name='comment_post_ID' value='58' id='comment_post_ID' />

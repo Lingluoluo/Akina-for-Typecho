@@ -59,7 +59,18 @@ var ajaxcomments = function(){
             data: $(this).serializeArray(),async: true,
             error: function(date) {
                 $("#submit").val("提交失败");
-                let msg = $(".container", date.responseText).prevObject[7].innerHTML.replace(/\s*/g,"");
+                // 优先用响应里的纯文本（如验证码错误），其次尝试解析页面里的报错块
+                let msg = "";
+                try {
+                    const raw = (date.responseText || "").trim();
+                    if (raw && raw.length < 200 && raw.indexOf("<") === -1) {
+                        msg = raw;
+                    } else {
+                        const nodes = $(".container", raw);
+                        msg = nodes.length > 7 ? nodes[7].innerHTML.replace(/\s*/g, "") : "";
+                    }
+                } catch (e) { msg = ""; }
+                if (!msg) { msg = "提交失败，请检查验证码或稍后重试"; }
                 $(document).ready(function(){
                     $.alert("提示",msg);
                 });
